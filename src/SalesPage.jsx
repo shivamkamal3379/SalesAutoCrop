@@ -21,6 +21,7 @@ import {
   CheckCircle,
   Clock,
   XCircle,
+  Menu,
 } from "lucide-react";
 
 // --- Dummy Data ---
@@ -41,7 +42,7 @@ const StatRow = ({ label, value }) => (
   </div>
 );
 
-// --- Dashboard Cards ---
+// --- Dashboard Cards (No change) ---
 const DashboardCards = ({ isDarkMode }) => {
   const cardStyle = `p-5 rounded-xl shadow-md transition-all duration-300 ${
     isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-800"
@@ -96,7 +97,7 @@ const DashboardCards = ({ isDarkMode }) => {
   );
 };
 
-// --- Line Chart ---
+// --- Line Chart (No change) ---
 const CashSalesChart = ({ isDarkMode }) => (
   <div
     className={`mt-10 p-6 rounded-xl shadow-md ${
@@ -125,7 +126,65 @@ const CashSalesChart = ({ isDarkMode }) => (
   </div>
 );
 
-// --- Payment Management Table ---
+// --- Bank Tally Entries Table (Custom Table) ---
+const BankTallyEntriesTable = ({ isDarkMode }) => {
+    const entries = [
+        { account: "HDFC Savings", date: "24 Oct", tally: "₹1,50,000", bank: "₹1,50,000", status: "Reconciled" },
+        { account: "ICICI Current", date: "23 Oct", tally: "₹85,000", bank: "₹84,500", status: "Discrepancy" },
+        { account: "SBI Business", date: "22 Oct", tally: "₹3,20,000", bank: "₹3,20,000", status: "Reconciled" },
+        { account: "Axis Corp", date: "21 Oct", tally: "₹45,000", bank: "₹45,000", status: "Reconciled" },
+    ];
+
+    const tableStyle = isDarkMode
+        ? "bg-gray-800 text-gray-100"
+        : "bg-white text-gray-900";
+
+    return (
+        <div className={`p-6 mt-6 rounded-xl shadow-md overflow-x-auto ${tableStyle}`}>
+            <h3 className="text-lg font-semibold mb-4">Bank Tally Reconciliation Details</h3>
+            <table className="w-full text-sm border-collapse">
+                <thead>
+                    <tr className={`${isDarkMode ? "bg-gray-700" : "bg-gray-100"} text-left`}>
+                        <th className="p-3">Account</th>
+                        <th className="p-3">Date</th>
+                        <th className="p-3">Tally Balance</th>
+                        <th className="p-3">Bank Balance</th>
+                        <th className="p-3">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {entries.map((e, idx) => (
+                        <tr
+                            key={idx}
+                            className={`border-b ${
+                                isDarkMode ? "border-gray-700" : "border-gray-200"
+                            } hover:bg-gray-700/30`}
+                        >
+                            <td className="p-3">{e.account}</td>
+                            <td className="p-3">{e.date}</td>
+                            <td className="p-3 font-medium">{e.tally}</td>
+                            <td className="p-3 font-medium">{e.bank}</td>
+                            <td className="p-3">
+                                {e.status === "Reconciled" ? (
+                                    <span className="flex items-center gap-1 text-green-400">
+                                        <CheckCircle size={16} /> {e.status}
+                                    </span>
+                                ) : (
+                                    <span className="flex items-center gap-1 text-red-400">
+                                        <XCircle size={16} /> {e.status}
+                                    </span>
+                                )}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+};
+
+
+// --- Payment Management Table (Original Recent Transactions Table) ---
 const PaymentTable = ({ isDarkMode }) => {
   const payments = [
     {
@@ -176,7 +235,7 @@ const PaymentTable = ({ isDarkMode }) => {
 
   return (
     <div className={`p-6 mt-6 rounded-xl shadow-md overflow-x-auto ${tableStyle}`}>
-      <h3 className="text-lg font-semibold mb-4">Payment Management</h3>
+      <h3 className="text-lg font-semibold mb-4">Recent Payment Transactions</h3>
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className={`${isDarkMode ? "bg-gray-700" : "bg-gray-100"} text-left`}>
@@ -226,14 +285,122 @@ const PaymentTable = ({ isDarkMode }) => {
   );
 };
 
+
+// --- Left Sidebar Component ---
+const PaymentSidebar = ({ isDarkMode, setActiveMenu, showSidebar }) => {
+  const sidebarItems = [
+    { label: "RPT Cash vs Bank", icon: TrendingUp },
+    { label: "Bounced Cheques", icon: Banknote },
+    { label: "RPT Instruments", icon: FileText },
+    { label: "Bank Tally Entries", icon: BarChart3 },
+    { label: "Recent Transactions", icon: Clock },
+  ];
+
+  const sidebarBg = isDarkMode ? "bg-gray-800" : "bg-white";
+  const itemStyle = (label) =>
+    `flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors duration-200 ${
+      isDarkMode ? "text-gray-200 hover:bg-gray-700" : "text-gray-700 hover:bg-gray-100"
+    }`;
+
+  
+  return (
+    <AnimatePresence>
+      {showSidebar && (
+        <motion.div
+          initial={{ x: "-100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "-100%" }}
+          transition={{ duration: 0.3 }}
+          className={`fixed inset-y-0 left-0 z-40 w-64 p-4 shadow-xl ${sidebarBg} lg:static lg:h-auto lg:w-64`}
+        >
+          <h3 className="text-xl font-semibold mb-6">Payment Sections</h3>
+          <div className="space-y-2">
+            {sidebarItems.map((item) => (
+              <button
+                key={item.label}
+                className={itemStyle(item.label)}
+                onClick={() => setActiveMenu(item.label)}
+              >
+                <item.icon className="w-5 h-5" />
+                <span>{item.label}</span>
+              </button>
+            ))}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
 // --- Main Component ---
 export default function SalesPage() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [activeMenu, setActiveMenu] = useState("Dashboard");
   const [showUserDropdown, setShowUserDropdown] = useState(false);
-  const [showOverviewDropdown, setShowOverviewDropdown] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false); 
 
   const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
+  
+  const handlePaymentManagementClick = () => {
+    // 1. Set the active menu to "Recent Transactions" (which shows the original table)
+    setActiveMenu("Recent Transactions"); 
+    // 2. Toggle the sidebar
+    setShowSidebar(prev => !prev); 
+  };
+  
+  // Close the sidebar when navigating to a different main section
+  const handleNavigation = (menuItem) => {
+    setActiveMenu(menuItem);
+    setShowSidebar(false);
+  }
+
+  const renderPaymentSubContent = () => {
+    // List of sidebar items that should only show the generic placeholder message (blank screen)
+    const sidebarPlaceholders = [
+        "RPT Cash vs Bank", 
+        "Bounced Cheques", 
+        "RPT Instruments", 
+    ];
+    
+    // Condition 3: Show Bank Tally Table
+    if (activeMenu === "Bank Tally Entries") {
+        return (
+            <div className="p-6 flex-grow">
+                <h2 className="text-3xl font-bold mb-4">Bank Tally Entries</h2>
+                <BankTallyEntriesTable isDarkMode={isDarkMode} />
+            </div>
+        );
+    }
+    
+    // Condition 1 & 2: Show Recent Transactions Table
+    if (activeMenu === "Recent Transactions") {
+        return (
+            <div className="p-6 flex-grow">
+                {/* Note: PaymentTable component now includes the title "Recent Payment Transactions" */}
+                <PaymentTable isDarkMode={isDarkMode} />
+            </div>
+        );
+    }
+
+    // Condition 4: Show Blank Placeholder for others
+    if (sidebarPlaceholders.includes(activeMenu)) {
+        return (
+            <div className="p-6 flex-grow">
+                <h2 className="text-3xl font-bold mb-4">{activeMenu}</h2>
+                <p className="text-gray-400">Content for **{activeMenu}** will be displayed here.</p>
+            </div>
+        );
+    }
+    
+    // Default fallback if a payment menu is active but not one of the specific ones above
+    return (
+        <div className="p-6 flex-grow">
+            <h2 className="text-3xl font-bold mb-4">Payment Management</h2>
+            <p className="text-gray-400">Please select an option from the sidebar.</p>
+        </div>
+    );
+  }
+
 
   const renderMainContent = () => {
     if (activeMenu === "Dashboard") {
@@ -246,29 +413,19 @@ export default function SalesPage() {
       );
     }
 
-    if (activeMenu === "Performance Summary") {
-      return (
+    // Check if the current menu is any of the payment/sidebar items
+    const isPaymentSection = activeMenu.includes("RPT") || activeMenu.includes("Bounced") || activeMenu.includes("Bank Tally") || activeMenu.includes("Recent Transactions");
+
+    if (isPaymentSection) {
+        return renderPaymentSubContent();
+    }
+
+    return (
         <div className="p-8">
-          <h2 className="text-2xl font-semibold mb-2">Performance Summary</h2>
-          <p className="text-gray-400">Detailed performance metrics will be displayed here.</p>
+            <h2 className="text-2xl font-semibold mb-2">Welcome</h2>
+            <p className="text-gray-400">Please select an option from the navigation bar.</p>
         </div>
-      );
-    }
-
-    if (activeMenu === "Activity Feed") {
-      return (
-        <div className="p-8">
-          <h2 className="text-2xl font-semibold mb-2">Activity Feed</h2>
-          <p className="text-gray-400">Recent user and system activities will appear here.</p>
-        </div>
-      );
-    }
-
-    if (activeMenu === "Payment Management") {
-      return <PaymentTable isDarkMode={isDarkMode} />;
-    }
-
-    return null;
+    );
   };
 
   const appBg = isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900";
@@ -278,10 +435,25 @@ export default function SalesPage() {
     <div className={`min-h-screen flex flex-col ${appBg}`}>
       {/* Navbar */}
       <nav className={`flex justify-between items-center px-6 py-4 shadow-md ${navbarBg}`}>
-        {/* Logo */}
-        <span className={`text-2xl font-black ${isDarkMode ? "text-indigo-400" : "text-indigo-700"}`}>
-          Sales Pro
-        </span>
+        {/* Logo and Sidebar Toggle */}
+        <div className="flex items-center">
+            {/* Show Menu button only when in a 'Payment' section */}
+            {(activeMenu.includes("RPT") || activeMenu.includes("Bounced") || activeMenu.includes("Bank Tally") || activeMenu.includes("Recent Transactions")) && (
+                <motion.button
+                    onClick={() => setShowSidebar(!showSidebar)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`p-2 mr-4 rounded-full ${
+                        isDarkMode ? "text-white hover:bg-gray-700" : "text-gray-700 hover:bg-gray-100"
+                    }`}
+                >
+                    <Menu size={24} />
+                </motion.button>
+            )}
+            <span className={`text-2xl font-black ${isDarkMode ? "text-indigo-400" : "text-indigo-700"}`}>
+                Sales Pro
+            </span>
+        </div>
 
         {/* Navigation */}
         <div className="flex space-x-4 items-center relative">
@@ -289,7 +461,7 @@ export default function SalesPage() {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => setActiveMenu("Dashboard")}
+            onClick={() => handleNavigation("Dashboard")}
             className={`px-4 py-2 rounded-lg ${
               activeMenu === "Dashboard"
                 ? "bg-indigo-600 text-white"
@@ -301,61 +473,13 @@ export default function SalesPage() {
             Dashboard
           </motion.button>
 
-          {/* Overview Dropdown */}
-          <div className="relative">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setShowOverviewDropdown((p) => !p)}
-              className={`px-4 py-2 flex items-center gap-2 rounded-lg ${
-                activeMenu.includes("Performance Summary") ||
-                activeMenu.includes("Activity Feed")
-                  ? "bg-indigo-600 text-white"
-                  : isDarkMode
-                  ? "text-gray-300 hover:bg-gray-700"
-                  : "text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              Overview
-              <ChevronDown className="w-4 h-4" />
-            </motion.button>
-
-            <AnimatePresence>
-              {showOverviewDropdown && (
-                <motion.div
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  className={`absolute right-0 mt-2 w-48 rounded-lg shadow-md z-50 ${
-                    isDarkMode ? "bg-gray-800 border border-gray-700" : "bg-white border border-gray-200"
-                  }`}
-                >
-                  {["Performance Summary", "Activity Feed"].map((item) => (
-                    <button
-                      key={item}
-                      onClick={() => {
-                        setActiveMenu(item);
-                        setShowOverviewDropdown(false);
-                      }}
-                      className={`w-full text-left px-4 py-2 rounded-md ${
-                        isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"
-                      }`}
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Payment Management */}
+          {/* Payment Management (Main clickable menu) */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => setActiveMenu("Payment Management")}
+            onClick={handlePaymentManagementClick} // Toggles sidebar and sets active menu to 'Recent Transactions'
             className={`px-4 py-2 rounded-lg ${
-              activeMenu === "Payment Management"
+              (activeMenu.includes("RPT") || activeMenu.includes("Bounced") || activeMenu.includes("Bank Tally") || activeMenu.includes("Recent Transactions"))
                 ? "bg-indigo-600 text-white"
                 : isDarkMode
                 ? "text-gray-300 hover:bg-gray-700"
@@ -366,9 +490,8 @@ export default function SalesPage() {
           </motion.button>
         </div>
 
-        {/* Right Controls */}
+        {/* Right Controls (User Card and Dark Mode Toggle) */}
         <div className="flex items-center gap-3 relative">
-          {/* User Card */}
           <button
             onClick={() => setShowUserDropdown(!showUserDropdown)}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg ${
@@ -381,8 +504,6 @@ export default function SalesPage() {
             <span className="font-medium text-sm">Ravi Verma</span>
             <ChevronDown className="w-4 h-4" />
           </button>
-
-          {/* Dropdown */}
           <AnimatePresence>
             {showUserDropdown && (
               <motion.div
@@ -420,8 +541,6 @@ export default function SalesPage() {
               </motion.div>
             )}
           </AnimatePresence>
-
-          {/* Dark Mode Toggle */}
           <motion.button
             onClick={toggleDarkMode}
             whileHover={{ scale: 1.1 }}
@@ -436,8 +555,20 @@ export default function SalesPage() {
         </div>
       </nav>
 
-      {/* Main Content */}
-      <main className="flex-grow overflow-y-auto">{renderMainContent()}</main>
+      {/* Main Content Area with Sidebar */}
+      <div className="flex flex-grow overflow-hidden">
+        {/* Sidebar Component */}
+        {(activeMenu.includes("RPT") || activeMenu.includes("Bounced") || activeMenu.includes("Bank Tally") || activeMenu.includes("Recent Transactions")) && (
+            <PaymentSidebar 
+                isDarkMode={isDarkMode} 
+                setActiveMenu={setActiveMenu} 
+                showSidebar={showSidebar}
+            />
+        )}
+        
+        {/* Main Content */}
+        <main className="flex-grow overflow-y-auto">{renderMainContent()}</main>
+      </div>
     </div>
   );
 }
