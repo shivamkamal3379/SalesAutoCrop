@@ -22,6 +22,13 @@ import {
   Clock,
   XCircle,
   Menu,
+  Building, 
+  Users,    
+  Wallet,   
+  ClipboardList, 
+  Briefcase, 
+  MapPin, 
+  Settings, 
 } from "lucide-react";
 
 // --- Dummy Data ---
@@ -42,7 +49,7 @@ const StatRow = ({ label, value }) => (
   </div>
 );
 
-// --- Dashboard Cards (No change) ---
+// --- Dashboard Cards (unchanged for brevity) ---
 const DashboardCards = ({ isDarkMode }) => {
   const cardStyle = `p-5 rounded-xl shadow-md transition-all duration-300 ${
     isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-800"
@@ -50,7 +57,6 @@ const DashboardCards = ({ isDarkMode }) => {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-      {/* Bounced Cheques */}
       <div className={cardStyle}>
         <div className="flex items-center mb-3">
           <Banknote className="w-5 h-5 text-red-400 mr-2" />
@@ -61,7 +67,6 @@ const DashboardCards = ({ isDarkMode }) => {
         <StatRow label="Riya Singh — SBI" value="₹25,500" />
       </div>
 
-      {/* RPT Cash vs Bank Stats */}
       <div className={cardStyle}>
         <div className="flex items-center mb-3">
           <TrendingUp className="w-5 h-5 text-indigo-400 mr-2" />
@@ -72,7 +77,6 @@ const DashboardCards = ({ isDarkMode }) => {
         <StatRow label="Pending Clearance" value="₹48K" />
       </div>
 
-      {/* RPT Instruments */}
       <div className={cardStyle}>
         <div className="flex items-center mb-3">
           <FileText className="w-5 h-5 text-yellow-400 mr-2" />
@@ -83,7 +87,6 @@ const DashboardCards = ({ isDarkMode }) => {
         <StatRow label="Pending" value="13" />
       </div>
 
-      {/* Bank Tally Entries */}
       <div className={cardStyle}>
         <div className="flex items-center mb-3">
           <BarChart3 className="w-5 h-5 text-green-400 mr-2" />
@@ -97,7 +100,7 @@ const DashboardCards = ({ isDarkMode }) => {
   );
 };
 
-// --- Line Chart (No change) ---
+// --- Line Chart (unchanged for brevity) ---
 const CashSalesChart = ({ isDarkMode }) => (
   <div
     className={`mt-10 p-6 rounded-xl shadow-md ${
@@ -129,10 +132,11 @@ const CashSalesChart = ({ isDarkMode }) => (
 // --- Bank Tally Entries Table (Custom Table) ---
 const BankTallyEntriesTable = ({ isDarkMode }) => {
     const entries = [
-        { account: "HDFC Savings", date: "24 Oct", tally: "₹1,50,000", bank: "₹1,50,000", status: "Reconciled" },
-        { account: "ICICI Current", date: "23 Oct", tally: "₹85,000", bank: "₹84,500", status: "Discrepancy" },
-        { account: "SBI Business", date: "22 Oct", tally: "₹3,20,000", bank: "₹3,20,000", status: "Reconciled" },
-        { account: "Axis Corp", date: "21 Oct", tally: "₹45,000", bank: "₹45,000", status: "Reconciled" },
+        { account: "HDFC Savings (RPT)", date: "24 Oct", tally: "₹1,50,000", bank: "₹1,50,000", status: "Reconciled" },
+        { account: "ICICI Current (Main)", date: "23 Oct", tally: "₹85,000", bank: "₹84,500", status: "Discrepancy" },
+        { account: "SBI Business (Petty)", date: "22 Oct", tally: "₹3,20,000", bank: "₹3,20,000", status: "Reconciled" },
+        { account: "Axis Corp (Cheques)", date: "21 Oct", tally: "₹45,000", bank: "₹46,000", status: "Discrepancy" },
+        { account: "PNB (Branch A)", date: "20 Oct", tally: "₹95,000", bank: "₹95,000", status: "Reconciled" },
     ];
 
     const tableStyle = isDarkMode
@@ -219,14 +223,6 @@ const PaymentTable = ({ isDarkMode }) => {
       status: "Failed",
       date: "20 Oct 2025",
     },
-    {
-      invoice: "#INV005",
-      client: "Global Wheels",
-      amount: "₹61,400",
-      mode: "UPI",
-      status: "Pending",
-      date: "26 Oct 2025",
-    },
   ];
 
   const tableStyle = isDarkMode
@@ -286,20 +282,83 @@ const PaymentTable = ({ isDarkMode }) => {
 };
 
 
-// --- Left Sidebar Component ---
-const PaymentSidebar = ({ isDarkMode, setActiveMenu, showSidebar }) => {
-  const sidebarItems = [
-    { label: "RPT Cash vs Bank", icon: TrendingUp },
-    { label: "Bounced Cheques", icon: Banknote },
-    { label: "RPT Instruments", icon: FileText },
-    { label: "Bank Tally Entries", icon: BarChart3 },
-    { label: "Recent Transactions", icon: Clock },
-  ];
+// --- Admin/Cash Dummy Data Table Component (New reusable component) ---
+const AdminDataTable = ({ isDarkMode, title, columns, data }) => {
+    const tableStyle = isDarkMode
+        ? "bg-gray-800 text-gray-100"
+        : "bg-white text-gray-900";
 
-  const sidebarBg = isDarkMode ? "bg-gray-800" : "bg-white";
-  const itemStyle = (label) =>
-    `flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors duration-200 ${
-      isDarkMode ? "text-gray-200 hover:bg-gray-700" : "text-gray-700 hover:bg-gray-100"
+    return (
+        <div className={`p-6 mt-6 rounded-xl shadow-md overflow-x-auto ${tableStyle}`}>
+            <h3 className="text-lg font-semibold mb-4">{title} (Dummy Data)</h3>
+            <table className="w-full text-sm border-collapse">
+                <thead>
+                    <tr className={`${isDarkMode ? "bg-gray-700" : "bg-gray-100"} text-left`}>
+                        {columns.map(col => <th key={col.key} className="p-3">{col.label}</th>)}
+                    </tr>
+                </thead>
+                <tbody>
+                    {data.map((row, idx) => (
+                        <tr
+                            key={idx}
+                            className={`border-b ${
+                                isDarkMode ? "border-gray-700" : "border-gray-200"
+                            } hover:bg-gray-700/30`}
+                        >
+                            {columns.map(col => (
+                                <td key={col.key} className="p-3">
+                                    {col.render ? col.render(row[col.key], row) : row[col.key]}
+                                </td>
+                            ))}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+};
+
+
+// --- Dynamic Sidebar Component (Used for Payment, Cash, and Settings) ---
+const DynamicSidebar = ({ isDarkMode, setActiveMenu, showSidebar, type }) => {
+    // Payment Sidebar Options
+    const paymentItems = [
+        { label: "Cash", icon: Wallet },
+        { label: "Instruments", icon: FileText },
+        { label: "Posting", icon: ClipboardList },
+        { label: "Bank Tally Entries", icon: BarChart3 },
+        { label: "Bounced Cheque", icon: Banknote },
+        { label: "RPT Closing Cash", icon: TrendingUp },
+    ];
+
+    // Cash Sidebar Options (As requested, these are the new Admin/Setup items)
+    const cashItems = [
+        { label: "Company Group", icon: Briefcase },
+        { label: "Company", icon: Building },
+        { label: "Branch", icon: MapPin },
+        { label: "Bank / Bank Allow", icon: Banknote },
+        { label: "User", icon: Users },
+    ];
+    
+    // Settings Sidebar Options (General configuration)
+    const settingsItems = [
+        { label: "Global Settings", icon: Settings },
+        { label: "User Roles", icon: Users },
+        { label: "System Logs", icon: ClipboardList },
+    ];
+
+    const sidebarConfig = {
+        payment: { title: "Payment Sections", items: paymentItems },
+        cash: { title: "Cash Setup / Admin", items: cashItems },
+        settings: { title: "Global Settings", items: settingsItems },
+    };
+
+    const config = sidebarConfig[type] || { title: "Menu", items: [] };
+
+    const sidebarBg = isDarkMode ? "bg-gray-800" : "bg-white";
+    const itemStyle = 
+        `flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors duration-200 ${
+        isDarkMode ? "text-gray-200 hover:bg-gray-700" : "text-gray-700 hover:bg-gray-100"
     }`;
 
   
@@ -313,13 +372,14 @@ const PaymentSidebar = ({ isDarkMode, setActiveMenu, showSidebar }) => {
           transition={{ duration: 0.3 }}
           className={`fixed inset-y-0 left-0 z-40 w-64 p-4 shadow-xl ${sidebarBg} lg:static lg:h-auto lg:w-64`}
         >
-          <h3 className="text-xl font-semibold mb-6">Payment Sections</h3>
+          <h3 className="text-xl font-semibold mb-6 font-medium text-indigo-400">{config.title}</h3>
           <div className="space-y-2">
-            {sidebarItems.map((item) => (
+            {config.items.map((item) => (
               <button
                 key={item.label}
-                className={itemStyle(item.label)}
-                onClick={() => setActiveMenu(item.label)}
+                className={itemStyle}
+                // Prepending a type prefix to ensure menu items from different sidebars don't clash
+                onClick={() => setActiveMenu(`${type}__${item.label}`)}
               >
                 <item.icon className="w-5 h-5" />
                 <span>{item.label}</span>
@@ -338,65 +398,167 @@ export default function SalesPage() {
   const [activeMenu, setActiveMenu] = useState("Dashboard");
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false); 
+  const [sidebarType, setSidebarType] = useState(null); // 'payment', 'cash', or 'settings'
 
   const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
   
-  const handlePaymentManagementClick = () => {
-    // 1. Set the active menu to "Recent Transactions" (which shows the original table)
-    setActiveMenu("Recent Transactions"); 
-    // 2. Toggle the sidebar
-    setShowSidebar(prev => !prev); 
+  const handleSidebarToggle = (menuType, defaultSubmenu) => {
+    if (sidebarType === menuType) {
+        // Toggle off if clicking the currently active sidebar's main button
+        setShowSidebar(prev => !prev);
+    } else {
+        // Switch to new sidebar
+        setSidebarType(menuType);
+        setActiveMenu(defaultSubmenu);
+        setShowSidebar(true);
+    }
   };
-  
-  // Close the sidebar when navigating to a different main section
+
   const handleNavigation = (menuItem) => {
     setActiveMenu(menuItem);
     setShowSidebar(false);
+    setSidebarType(null);
   }
 
+  // --- Payment Content Renderer ---
   const renderPaymentSubContent = () => {
-    // List of sidebar items that should only show the generic placeholder message (blank screen)
-    const sidebarPlaceholders = [
-        "RPT Cash vs Bank", 
-        "Bounced Cheques", 
-        "RPT Instruments", 
-    ];
-    
-    // Condition 3: Show Bank Tally Table
-    if (activeMenu === "Bank Tally Entries") {
+    const submenu = activeMenu.split('__')[1] || "Cash"; 
+
+    if (submenu === "Bank Tally Entries") {
         return (
             <div className="p-6 flex-grow">
-                <h2 className="text-3xl font-bold mb-4">Bank Tally Entries</h2>
+                <h2 className="text-3xl font-bold mb-4">{submenu}</h2>
                 <BankTallyEntriesTable isDarkMode={isDarkMode} />
             </div>
         );
     }
     
-    // Condition 1 & 2: Show Recent Transactions Table
-    if (activeMenu === "Recent Transactions") {
+    // Show Recent Transactions Table (default for Payment, linked to "Cash" button)
+    if (submenu === "Cash") {
         return (
             <div className="p-6 flex-grow">
-                {/* Note: PaymentTable component now includes the title "Recent Payment Transactions" */}
                 <PaymentTable isDarkMode={isDarkMode} />
             </div>
         );
     }
 
-    // Condition 4: Show Blank Placeholder for others
-    if (sidebarPlaceholders.includes(activeMenu)) {
-        return (
-            <div className="p-6 flex-grow">
-                <h2 className="text-3xl font-bold mb-4">{activeMenu}</h2>
-                <p className="text-gray-400">Content for **{activeMenu}** will be displayed here.</p>
-            </div>
-        );
-    }
-    
-    // Default fallback if a payment menu is active but not one of the specific ones above
+    // Show Blank Placeholder for others
     return (
         <div className="p-6 flex-grow">
-            <h2 className="text-3xl font-bold mb-4">Payment Management</h2>
-            <p className="text-gray-400">Please select an option from the sidebar.</p>
+            <h2 className="text-3xl font-bold mb-4">{submenu}</h2>
+            <p className="text-gray-400">Content for **{submenu}** will be displayed here.</p>
+        </div>
+    );
+  }
+
+  // --- Cash Content Renderer (displays all new dummy tables) ---
+  const renderCashSubContent = () => {
+    const submenu = activeMenu.split('__')[1] || "Company Group";
+
+    // 1. Company Group Data
+    const companyGroupData = {
+      title: "Company Groups Setup",
+      columns: [{ key: "id", label: "ID" }, { key: "name", label: "Group Name" }, { key: "companies", label: "Companies Count" }, { key: "status", label: "Status" }],
+      data: [
+        { id: 1, name: "North Zone", companies: 4, status: "Active" },
+        { id: 2, name: "South Zone", companies: 3, status: "Active" },
+        { id: 3, name: "HQ Support", companies: 1, status: "Inactive" },
+      ]
+    };
+
+    // 2. Company Data
+    const companyData = {
+      title: "Company List",
+      columns: [{ key: "id", label: "ID" }, { key: "name", label: "Company Name" }, { key: "group", label: "Group" }, { key: "branches", label: "Branches" }],
+      data: [
+        { id: 101, name: "Apex Motors Pvt Ltd", group: "North Zone", branches: 8 },
+        { id: 102, name: "Global Wheels Ltd", group: "South Zone", branches: 5 },
+        { id: 103, name: "RPT Finances", group: "HQ Support", branches: 1 },
+      ]
+    };
+
+    // 3. Branch Data
+    const branchData = {
+      title: "Branch Locations",
+      columns: [{ key: "id", label: "ID" }, { key: "name", label: "Branch Name" }, { key: "city", label: "City" }, { key: "manager", label: "Manager" }],
+      data: [
+        { id: 501, name: "Rajpura Main", city: "Rajpura", manager: "Vikas Sharma" },
+        { id: 502, name: "Ambala Hub", city: "Ambala", manager: "Ria Singh" },
+        { id: 503, name: "Delhi West", city: "New Delhi", manager: "Amit Verma" },
+      ]
+    };
+
+    // 4. Bank/Bank Allow Data
+    const bankData = {
+      title: "Bank Configuration",
+      columns: [{ key: "id", label: "ID" }, { key: "bank", label: "Bank Name" }, { key: "account", label: "Account Type" }, { key: "status", label: "Allow Posting" }],
+      data: [
+        { id: 801, bank: "HDFC Bank", account: "Current (RPT)", status: "Yes" },
+        { id: 802, bank: "ICICI Bank", account: "Savings (Cheque)", status: "Yes" },
+        { id: 803, bank: "SBI Bank", account: "Current (Cash)", status: "No" },
+      ]
+    };
+
+    // 5. User Data
+    const userData = {
+      title: "System Users List",
+      columns: [{ key: "id", label: "ID" }, { key: "name", label: "Name" }, { key: "role", label: "Role" }, { key: "branch", label: "Branch ID" }],
+      data: [
+        { id: 901, name: "Ravi Verma", role: "Cluster Head", branch: 501 },
+        { id: 902, name: "Suman Devi", role: "Accountant", branch: 502 },
+        { id: 903, name: "Rajesh Kumar", role: "Teller", branch: 503 },
+      ]
+    };
+    
+    let currentData = null;
+    let currentTitle = submenu;
+
+    switch (submenu) {
+        case "Company Group":
+            currentData = companyGroupData;
+            break;
+        case "Company":
+            currentData = companyData;
+            break;
+        case "Branch":
+            currentData = branchData;
+            break;
+        case "Bank / Bank Allow":
+            currentData = bankData;
+            break;
+        case "User":
+            currentData = userData;
+            break;
+        default:
+            return (
+                <div className="p-6 flex-grow">
+                    <h2 className="text-3xl font-bold mb-4">Cash Admin: {submenu}</h2>
+                    <p className="text-gray-400">Please select a setup option from the sidebar.</p>
+                </div>
+            );
+    }
+
+    return (
+        <div className="p-6 flex-grow">
+            <h2 className="text-3xl font-bold mb-4">Cash Admin: {submenu}</h2>
+            <AdminDataTable
+                isDarkMode={isDarkMode}
+                title={currentData.title}
+                columns={currentData.columns}
+                data={currentData.data}
+            />
+        </div>
+    );
+  }
+  
+  // --- Settings Content Renderer (unchanged for brevity) ---
+  const renderSettingsSubContent = () => {
+    const submenu = activeMenu.split('__')[1] || "Global Settings";
+
+    return (
+        <div className="p-6 flex-grow">
+            <h2 className="text-3xl font-bold mb-4">Settings: {submenu}</h2>
+            <p className="text-gray-400">Configuration content for **{submenu}** will be managed here.</p>
         </div>
     );
   }
@@ -412,14 +574,20 @@ export default function SalesPage() {
         </div>
       );
     }
-
-    // Check if the current menu is any of the payment/sidebar items
-    const isPaymentSection = activeMenu.includes("RPT") || activeMenu.includes("Bounced") || activeMenu.includes("Bank Tally") || activeMenu.includes("Recent Transactions");
-
-    if (isPaymentSection) {
+    
+    // Check for Payment, Cash, or Settings sections
+    if (activeMenu.startsWith('payment__') || sidebarType === 'payment') {
         return renderPaymentSubContent();
     }
-
+    
+    if (activeMenu.startsWith('cash__') || sidebarType === 'cash') {
+        return renderCashSubContent();
+    }
+    
+    if (activeMenu.startsWith('settings__') || sidebarType === 'settings') {
+        return renderSettingsSubContent();
+    }
+    
     return (
         <div className="p-8">
             <h2 className="text-2xl font-semibold mb-2">Welcome</h2>
@@ -430,6 +598,8 @@ export default function SalesPage() {
 
   const appBg = isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900";
   const navbarBg = isDarkMode ? "bg-gray-800" : "bg-white";
+  
+  const isSidebarActive = activeMenu.startsWith('payment__') || activeMenu.startsWith('cash__') || activeMenu.startsWith('settings__');
 
   return (
     <div className={`min-h-screen flex flex-col ${appBg}`}>
@@ -437,8 +607,8 @@ export default function SalesPage() {
       <nav className={`flex justify-between items-center px-6 py-4 shadow-md ${navbarBg}`}>
         {/* Logo and Sidebar Toggle */}
         <div className="flex items-center">
-            {/* Show Menu button only when in a 'Payment' section */}
-            {(activeMenu.includes("RPT") || activeMenu.includes("Bounced") || activeMenu.includes("Bank Tally") || activeMenu.includes("Recent Transactions")) && (
+            {/* Show Menu button only when a sidebar is relevant */}
+            {(isSidebarActive || showSidebar) && (
                 <motion.button
                     onClick={() => setShowSidebar(!showSidebar)}
                     whileHover={{ scale: 1.05 }}
@@ -472,14 +642,14 @@ export default function SalesPage() {
           >
             Dashboard
           </motion.button>
-
-          {/* Payment Management (Main clickable menu) */}
+            
+          {/* Payment Management */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={handlePaymentManagementClick} // Toggles sidebar and sets active menu to 'Recent Transactions'
+            onClick={() => handleSidebarToggle('payment', 'payment__Cash')}
             className={`px-4 py-2 rounded-lg ${
-              (activeMenu.includes("RPT") || activeMenu.includes("Bounced") || activeMenu.includes("Bank Tally") || activeMenu.includes("Recent Transactions"))
+              sidebarType === 'payment'
                 ? "bg-indigo-600 text-white"
                 : isDarkMode
                 ? "text-gray-300 hover:bg-gray-700"
@@ -488,10 +658,43 @@ export default function SalesPage() {
           >
             Payment Management
           </motion.button>
+
+          {/* Cash (New top-level section) */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleSidebarToggle('cash', 'cash__Company Group')}
+            className={`px-4 py-2 rounded-lg ${
+              sidebarType === 'cash'
+                ? "bg-indigo-600 text-white"
+                : isDarkMode
+                ? "text-gray-300 hover:bg-gray-700"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            Cash
+          </motion.button>
+          
+          {/* Settings (Renamed from Administrator) */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleSidebarToggle('settings', 'settings__Global Settings')}
+            className={`px-4 py-2 rounded-lg ${
+              sidebarType === 'settings'
+                ? "bg-indigo-600 text-white"
+                : isDarkMode
+                ? "text-gray-300 hover:bg-gray-700"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            Settings
+          </motion.button>
         </div>
 
-        {/* Right Controls (User Card and Dark Mode Toggle) */}
+        {/* Right Controls */}
         <div className="flex items-center gap-3 relative">
+          {/* User Card - UPDATED */}
           <button
             onClick={() => setShowUserDropdown(!showUserDropdown)}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg ${
@@ -499,11 +702,13 @@ export default function SalesPage() {
             }`}
           >
             <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold">
-              R
+              A {/* Changed initial from R to A */}
             </div>
-            <span className="font-medium text-sm">Ravi Verma</span>
+            <span className="font-medium text-sm">Administ</span> {/* Changed Name */}
             <ChevronDown className="w-4 h-4" />
           </button>
+
+          {/* Dropdown - UPDATED */}
           <AnimatePresence>
             {showUserDropdown && (
               <motion.div
@@ -518,9 +723,9 @@ export default function SalesPage() {
                 }`}
               >
                 <div className="mb-3">
-                  <h4 className="font-semibold text-lg">Ravi Verma</h4>
-                  <p className="text-sm text-gray-400">Cluster Head</p>
-                  <p className="text-xs text-gray-500 mt-1">Member since April 2022</p>
+                  <h4 className="font-semibold text-lg">Administ</h4> {/* Changed Name */}
+                  <p className="text-sm text-gray-400">CEO</p> {/* Changed Title */}
+                  <p className="text-xs text-gray-500 mt-1">Member since 1990</p> {/* Changed Date */}
                 </div>
                 <div className="border-t border-gray-600 mt-2 pt-2 flex flex-col space-y-2">
                   <button
@@ -555,18 +760,17 @@ export default function SalesPage() {
         </div>
       </nav>
 
-      {/* Main Content Area with Sidebar */}
       <div className="flex flex-grow overflow-hidden">
-        {/* Sidebar Component */}
-        {(activeMenu.includes("RPT") || activeMenu.includes("Bounced") || activeMenu.includes("Bank Tally") || activeMenu.includes("Recent Transactions")) && (
-            <PaymentSidebar 
+        {sidebarType && (
+            <DynamicSidebar 
                 isDarkMode={isDarkMode} 
                 setActiveMenu={setActiveMenu} 
                 showSidebar={showSidebar}
+                type={sidebarType}
             />
         )}
         
-         <main className="flex-grow overflow-y-auto">{renderMainContent()}</main>
+        <main className="flex-grow overflow-y-auto">{renderMainContent()}</main>
       </div>
     </div>
   );
